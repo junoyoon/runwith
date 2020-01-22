@@ -1,4 +1,4 @@
-package me.ryan.runwith.baeldung.test;
+package me.ryan.runwith.baeldung.exec;
 
 
 import me.ryan.runwith.baeldung.runner.BlockingTestRunner;
