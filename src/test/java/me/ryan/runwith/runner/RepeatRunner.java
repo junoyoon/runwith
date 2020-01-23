@@ -1,5 +1,6 @@
 package me.ryan.runwith.runner;
 
+import me.ryan.runwith.annotation.handler.RepeatHandler;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -15,6 +16,8 @@ public class RepeatRunner extends Runner {
         this.testClass = testClass;
     }
 
+    private RepeatHandler repeatHandler = new RepeatHandler();
+
     @Override
     public Description getDescription() {
         return Description.createTestDescription(testClass, "Repeat Runner Description");
@@ -27,9 +30,7 @@ public class RepeatRunner extends Runner {
             Object testObject = testClass.getDeclaredConstructor().newInstance();
             for (Method method : testClass.getMethods()) {
                 if (method.isAnnotationPresent(Test.class)) {
-                    notifier.fireTestStarted(Description.EMPTY);
-                    method.invoke(testObject);
-                    notifier.fireTestFinished(Description.EMPTY);
+                    repeatHandler.handleInternal(notifier, testObject, method);
                 }
             }
         } catch (Exception e) {
