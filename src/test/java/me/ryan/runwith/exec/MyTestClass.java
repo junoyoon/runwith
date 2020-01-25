@@ -39,13 +39,24 @@ public class MyTestClass {
     }
 
     @Test
-//    @Repeat
-    public void fiboTest() {
+    public void given_fibo_when_numberIs6_then_returnValueIs8() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
         int number = 6;
         int expected = 8;
-        int result = fibo.calculateFibo(6);
+        int result = fibo.calculateFibo(number);
+        System.out.println(result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @Repeat(-1)
+    public void given_RepeatAnnotation_when_valueIsMinus1_then_skipThisTest() {
+        Fibo fibo = new Fibo();
+        // 1 1 2 3 5 8 13 21 34 ...
+        int number = 7;
+        int expected = 13;
+        int result = fibo.calculateFibo(number);
         System.out.println(result);
         assertEquals(expected, result);
     }

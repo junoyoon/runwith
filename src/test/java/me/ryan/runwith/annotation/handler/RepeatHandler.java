@@ -24,12 +24,15 @@ public class RepeatHandler extends Statement {
     public RepeatHandler(Statement next, Method testMethod, int repeat, boolean repeatable) {
         this.next = next;
         this.testMethod = testMethod;
-        this.repeat = Math.max(1, repeat);
+        this.repeat = repeat;
         this.repeatable = repeatable;
     }
 
     @Override
     public void evaluate() throws Throwable {
+        if (this.repeat < 1 && log.isInfoEnabled()) {
+            log.info(String.format("Repeat value is %d. Skip [%s]] test.", this.repeat, this.testMethod.getName()));
+        }
         for (int i = 0; i < this.repeat; i++) {
             if (repeatable && log.isInfoEnabled()) {
                 log.info(String.format("Repeat # %d Method is [%s]", i + 1, this.testMethod.getName()));

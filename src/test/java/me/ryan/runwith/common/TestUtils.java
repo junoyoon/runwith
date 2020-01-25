@@ -11,7 +11,7 @@ public class TestUtils {
         if (repeat == null) {
             return 1;
         }
-        return Math.max(1, repeat.value());
+        return repeat.value();
     }
 
     public static boolean isRepeatable(Method method) {
