@@ -1,6 +1,5 @@
 package me.ryan.runwith.runner;
 
-import me.ryan.runwith.annotation.Repeat;
 import me.ryan.runwith.annotation.handler.RepeatHandler;
 import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.internal.runners.statements.Fail;
@@ -39,16 +38,11 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
         statement = possiblyExpectingExceptions(method, test, statement);
         statement = withBefores(method, test, statement);
         statement = withAfters(method, test, statement);
-        statement = withRepeats(method, test, statement);
+        statement = withRepeats(method, statement);
         return statement;
     }
 
-    protected Statement withRepeats(FrameworkMethod frameworkMethod, Object testInstance, Statement next) {
-        Repeat repeat = frameworkMethod.getAnnotation(Repeat.class);
-        int repeatCount = 1;
-        if (repeat != null) {
-            repeatCount = repeat.value();
-        }
-        return new RepeatHandler(next, frameworkMethod.getMethod(), repeatCount);
+    protected Statement withRepeats(FrameworkMethod frameworkMethod, Statement next) {
+        return new RepeatHandler(next, frameworkMethod.getMethod());
     }
 }
