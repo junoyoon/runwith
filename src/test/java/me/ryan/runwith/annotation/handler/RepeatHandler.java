@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeoutException;
 
 public class RepeatHandler extends Statement {
 
@@ -30,6 +31,7 @@ public class RepeatHandler extends Statement {
 
     @Override
     public void evaluate() throws Throwable {
+        long startTime = System.currentTimeMillis();
         if (this.repeat < 1 && log.isInfoEnabled()) {
             log.info(String.format("Repeat value is %d. Skip [%s]] test.", this.repeat, this.testMethod.getName()));
         }
@@ -38,6 +40,12 @@ public class RepeatHandler extends Statement {
                 log.info(String.format("Repeat # %d Method is [%s]", i + 1, this.testMethod.getName()));
             }
             this.next.evaluate();
+        }
+        long elapsed = System.currentTimeMillis() - startTime;
+        long timeout = TestUtils.getRepeatTimeout(testMethod);
+        if (timeout > 0 && elapsed > timeout) {
+            throw new TimeoutException(
+                    String.format("All repeat test took %s ms; limit was %s ms.", elapsed, timeout));
         }
     }
 }

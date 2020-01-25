@@ -20,4 +20,13 @@ public class TestUtils {
         }
         return false;
     }
+
+    public static long getRepeatTimeout(Method method) {
+        Repeat repeat = method.getAnnotation(Repeat.class);
+        if (repeat == null) {
+            return 0;
+        } else {
+            return repeat.timeout();
+        }
+    }
 }

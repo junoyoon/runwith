@@ -64,9 +64,8 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(10)
+    @Repeat(value = 10, timeout = 10000)    // 전체 수행시간 10초 제한
     public void given_fibo_when_numberIs43Repeat10Times_then_returnValueIs433494437AndFinishIn10seconds() {
-        long startTime = System.currentTimeMillis();
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
         int number = 43;
@@ -74,10 +73,5 @@ public class MyTestClass {
         int result = fibo.calculateFibo(number);
         System.out.println(result);
         assertEquals(expected, result);
-        long elapsed = System.currentTimeMillis() - startTime;
-        System.out.println(elapsed);
-        assertThat(elapsed, lessThanOrEqualTo(1000L));  // 하나에 1초안에 끝나야 전체가 10초안에 가능
-
     }
-
 }

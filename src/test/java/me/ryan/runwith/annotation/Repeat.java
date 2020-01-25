@@ -7,4 +7,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Repeat {
     int value() default 1;
+    long timeout() default 0;   // Timeout for all repeat millisecond
 }
