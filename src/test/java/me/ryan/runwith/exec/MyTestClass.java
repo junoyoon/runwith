@@ -1,5 +1,6 @@
 package me.ryan.runwith.exec;
 
+import me.ryan.runwith.algo.Fibo;
 import me.ryan.runwith.annotation.Repeat;
 import me.ryan.runwith.runner.RepeatRunner;
 import me.ryan.runwith.sample.Calculator;
@@ -33,6 +34,17 @@ public class MyTestClass {
         int b = 3;
         int expected = 5;
         int result = calculator.add(a, b);
+        System.out.println(result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void fiboTest() {
+        Fibo fibo = new Fibo();
+        // 1 1 2 3 5 8 13 21 34 ...
+        int number = 6;
+        int expected = 8;
+        int result = fibo.calculateFibo(6);
         System.out.println(result);
         assertEquals(expected, result);
     }
