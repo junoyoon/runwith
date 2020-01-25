@@ -1,40 +1,54 @@
 package me.ryan.runwith.runner;
 
+import me.ryan.runwith.annotation.Repeat;
 import me.ryan.runwith.annotation.handler.RepeatHandler;
-import org.junit.Test;
-import org.junit.runner.Description;
-import org.junit.runner.Runner;
-import org.junit.runner.notification.RunNotifier;
+import org.junit.internal.runners.model.ReflectiveCallable;
+import org.junit.internal.runners.statements.Fail;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
-import java.lang.reflect.Method;
+public class RepeatRunner extends BlockJUnit4ClassRunner {
 
-public class RepeatRunner extends Runner {
-
-    private Class testClass;
-
-    public RepeatRunner(Class testClass) {
-        this.testClass = testClass;
-    }
-
-    private RepeatHandler repeatHandler = new RepeatHandler();
-
-    @Override
-    public Description getDescription() {
-        return Description.createTestDescription(testClass, "Repeat Runner Description");
+    /**
+     * Creates a BlockJUnit4ClassRunner to run {@code klass}
+     *
+     * @param klass
+     * @throws InitializationError if the test class is malformed.
+     */
+    public RepeatRunner(Class<?> klass) throws InitializationError {
+        super(klass);
     }
 
     @Override
-    public void run(RunNotifier notifier) {
-        System.out.println("running the tests from MyRunner : " + testClass);
+    protected Statement methodBlock(FrameworkMethod method) {
+        Object test;
         try {
-            Object testObject = testClass.getDeclaredConstructor().newInstance();
-            for (Method method : testClass.getMethods()) {
-                if (method.isAnnotationPresent(Test.class)) {
-                    repeatHandler.handleInternal(notifier, testObject, method);
+            test = new ReflectiveCallable() {
+                @Override
+                protected Object runReflectiveCall() throws Throwable {
+                    return createTest();
                 }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            }.run();
+        } catch (Throwable e) {
+            return new Fail(e);
         }
+
+        Statement statement = methodInvoker(method, test);
+        statement = possiblyExpectingExceptions(method, test, statement);
+        statement = withBefores(method, test, statement);
+        statement = withAfters(method, test, statement);
+        statement = withRepeats(method, test, statement);
+        return statement;
+    }
+
+    protected Statement withRepeats(FrameworkMethod frameworkMethod, Object testInstance, Statement next) {
+        Repeat repeat = frameworkMethod.getAnnotation(Repeat.class);
+        int repeatCount = 1;
+        if (repeat != null) {
+            repeatCount = repeat.value();
+        }
+        return new RepeatHandler(next, frameworkMethod.getMethod(), repeatCount);
     }
 }

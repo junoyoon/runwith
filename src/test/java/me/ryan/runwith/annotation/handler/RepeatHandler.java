@@ -1,34 +1,25 @@
 package me.ryan.runwith.annotation.handler;
 
-import me.ryan.runwith.annotation.Repeat;
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.Statement;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class RepeatHandler {
+public class RepeatHandler extends Statement {
 
-    public <T> T handleInternal(RunNotifier notifier, T targetObject, Method method) {
-        Repeat repeat = method.getAnnotation(Repeat.class);
-        int testCount;
-        if (repeat != null && repeat.value() > 1) {
-            testCount = repeat.value();
-        } else {
-            testCount = 1;
+    private final Statement next;
+    private final Method testMethod;
+    private final int repeat;
+
+    public RepeatHandler(Statement next, Method testMethod, int repeat) {
+        this.next = next;
+        this.testMethod = testMethod;
+        this.repeat = repeat;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+        for (int i = 0; i < this.repeat; i++) {
+            this.next.evaluate();
         }
-        method.setAccessible(true);
-        try {
-            for (int i = 0; i < testCount; i++) {
-                notifier.fireTestStarted(Description.EMPTY);
-                method.invoke(targetObject);
-                notifier.fireTestFinished(Description.EMPTY);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return targetObject;
     }
 }
