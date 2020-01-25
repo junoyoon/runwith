@@ -7,7 +7,9 @@ import me.ryan.runwith.sample.Calculator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @RunWith(RepeatRunner.class)
 public class MyTestClass {
@@ -59,6 +61,23 @@ public class MyTestClass {
         int result = fibo.calculateFibo(number);
         System.out.println(result);
         assertEquals(expected, result);
+    }
+
+    @Test
+    @Repeat(10)
+    public void given_fibo_when_numberIs43Repeat10Times_then_returnValueIs433494437AndFinishIn10seconds() {
+        long startTime = System.currentTimeMillis();
+        Fibo fibo = new Fibo();
+        // 1 1 2 3 5 8 13 21 34 ...
+        int number = 43;
+        int expected = 433494437;
+        int result = fibo.calculateFibo(number);
+        System.out.println(result);
+        assertEquals(expected, result);
+        long elapsed = System.currentTimeMillis() - startTime;
+        System.out.println(elapsed);
+        assertThat(elapsed, lessThanOrEqualTo(1000L));  // 하나에 1초안에 끝나야 전체가 10초안에 가능
+
     }
 
 }
