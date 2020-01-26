@@ -86,8 +86,8 @@ public class MyTestClass {
     }
 
     @Test(timeout = 6000)
-    @Repeat(value = 5, timeout = 7000)    // 타임아웃이 모두 설정된경우 익셉션 처
-    public void given_fibo_when_setTimeout7SecondAndTestTimeoutSet_thenThrowIllegalStateException() {
+    @Repeat(value = 5, timeout = 7000)    // 타임아웃이 모두 설정된경우 익셉션 처리
+    public void given_fibo_when_setTestTimeoutAndRepeatTimeout_thenThrowIllegalStateException() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
         int number = 43;
