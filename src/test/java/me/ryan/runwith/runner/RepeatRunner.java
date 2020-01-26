@@ -11,6 +11,10 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
+import java.util.List;
+
+import static org.junit.internal.runners.rules.RuleMemberValidator.RULE_METHOD_VALIDATOR;
+
 public class RepeatRunner extends BlockJUnit4ClassRunner {
 
     protected static final Log log = LogFactory.getLog(RepeatRunner.class);
@@ -23,6 +27,18 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
      */
     public RepeatRunner(Class<?> klass) throws InitializationError {
         super(klass);
+    }
+
+    @Override
+    protected void collectInitializationErrors(List<Throwable> errors) {
+        validateNoNonStaticInnerClass(errors);
+        validateConstructor(errors);
+        validateFields(errors);
+        validateMethods(errors);
+    }
+
+    private void validateMethods(List<Throwable> errors) {
+        RULE_METHOD_VALIDATOR.validate(getTestClass(), errors);
     }
 
     @Override
@@ -43,11 +59,11 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
         statement = possiblyExpectingExceptions(method, test, statement);
         statement = withBefores(method, test, statement);
         statement = withAfters(method, test, statement);
-        statement = withRepeats(method, statement);
+        statement = withRepeats(method, test, statement);
         return statement;
     }
 
-    protected Statement withRepeats(FrameworkMethod frameworkMethod, Statement next) {
+    protected Statement withRepeats(FrameworkMethod frameworkMethod, Object target, Statement next) {
         // check timeout
         long testTimeout = TestUtils.getTestTimeout(frameworkMethod);
         long repeatTimeout = TestUtils.getRepeatTimeout(frameworkMethod.getMethod());
@@ -58,6 +74,6 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
             log.error(msg);
             throw new IllegalStateException(msg);
         }
-        return new RepeatHandler(next, frameworkMethod.getMethod());
+        return new RepeatHandler(next, target, frameworkMethod.getMethod());
     }
 }
