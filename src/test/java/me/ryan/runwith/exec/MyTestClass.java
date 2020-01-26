@@ -96,4 +96,12 @@ public class MyTestClass {
         System.out.println(result);
         assertEquals(expected, result);
     }
+
+    @Test
+    @Repeat(value = 5, params = {"3, 2", "4, 3", "5, 5", "6, 8", "7, 13"})  // 파라미터 반복 수행 테스트
+    public void given_fibo_when_parameters_thenSuccessTest(int number, int expected) {
+        Fibo fibo = new Fibo();
+        int result = fibo.calculateFibo(number);
+        assertEquals(expected, result);
+    }
 }
