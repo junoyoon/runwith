@@ -7,9 +7,7 @@ import me.ryan.runwith.sample.Calculator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 @RunWith(RepeatRunner.class)
 public class MyTestClass {
@@ -64,8 +62,20 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(value = 10, timeout = 10000)    // 전체 수행시간 10초 제한
+    @Repeat(value = 10, timeout = 30000)  // 전체 수행시간 30초 제한
     public void given_fibo_when_numberIs43Repeat10Times_then_returnValueIs433494437AndFinishIn10seconds() {
+        Fibo fibo = new Fibo();
+        // 1 1 2 3 5 8 13 21 34 ...
+        int number = 43;
+        int expected = 433494437;
+        int result = fibo.calculateFibo(number);
+        System.out.println(result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @Repeat(value = 10, timeout = 7000)    // 전체 수행시간 7초 제한
+    public void given_fibo_when_setTimeout5Second_thenThrowExceptionImmediately() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
         int number = 43;
