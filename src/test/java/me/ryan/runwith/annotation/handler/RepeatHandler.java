@@ -48,5 +48,9 @@ public class RepeatHandler extends Statement {
                         String.format("All repeat test took %s ms; limit was %s ms. Repeat count is %d/%d.", elapsed, timeout, (i + 1), this.repeat));
             }
         }
+        long totalElapsed = System.currentTimeMillis() - startTime;
+        if (timeout > 0 && log.isInfoEnabled()) {
+            log.info(String.format("Repeat finished. Total elapsed %s/%s ms.", totalElapsed, timeout));
+        }
     }
 }
