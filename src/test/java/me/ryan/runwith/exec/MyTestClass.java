@@ -62,7 +62,7 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(value = 10, timeout = 30000)  // 전체 수행시간 30초 제한
+    @Repeat(value = 10, timeout = 30000)  // 전체 수행시간 30초 제
     public void given_fibo_when_numberIs43Repeat10Times_then_returnValueIs433494437AndFinishIn10seconds() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
@@ -76,6 +76,18 @@ public class MyTestClass {
     @Test
     @Repeat(value = 2, timeout = 7000)    // 전체 수행시간 7초 제한
     public void given_fibo_when_setTimeout5Second_thenThrowExceptionImmediately() {
+        Fibo fibo = new Fibo();
+        // 1 1 2 3 5 8 13 21 34 ...
+        int number = 43;
+        int expected = 433494437;
+        int result = fibo.calculateFibo(number);
+        System.out.println(result);
+        assertEquals(expected, result);
+    }
+
+    @Test(timeout = 6000)
+    @Repeat(value = 5, timeout = 7000)    // 타임아웃이 모두 설정된경우 익셉션 처
+    public void given_fibo_when_setTimeout7SecondAndTestTimeoutSet_thenThrowIllegalStateException() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
         int number = 43;
