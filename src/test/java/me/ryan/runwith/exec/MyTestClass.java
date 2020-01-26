@@ -104,4 +104,12 @@ public class MyTestClass {
         int result = fibo.calculateFibo(number);
         assertEquals(expected, result);
     }
+
+    @Test
+    @Repeat(value = 6, params = {"3, 2", "4, 3", "5, 5", "6, 8", "7, 13"})  // 파라미터 갯수와 repeat value 가 다르면 에러.
+    public void given_fibo_when_differentValueAndParametersSize_thenThrowException(int number, int expected) {
+        Fibo fibo = new Fibo();
+        int result = fibo.calculateFibo(number);
+        assertEquals(expected, result);
+    }
 }
