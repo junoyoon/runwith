@@ -113,4 +113,12 @@ public class MyTestClass {
         int result = fibo.calculateFibo(number);
         assertEquals(expected, result);
     }
+
+    @Test
+    @Repeat(value = 5, params = {"3, 2", "4, 3", "5, 5", "6, 8", "7, true"})  // 테스트 케이스에서 사용하는 인자 타입과 params 의 타입이 다른경우 에러.
+    public void given_fibo_when_differentTestCaseParamsAndParametersType_thenThrowException(int number, int expected) {
+        Fibo fibo = new Fibo();
+        int result = fibo.calculateFibo(number);
+        assertEquals(expected, result);
+    }
 }
