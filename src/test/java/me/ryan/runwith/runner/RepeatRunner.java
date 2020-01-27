@@ -2,6 +2,7 @@ package me.ryan.runwith.runner;
 
 import me.ryan.runwith.annotation.handler.RepeatHandler;
 import me.ryan.runwith.common.TestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.internal.runners.model.ReflectiveCallable;
@@ -11,7 +12,9 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.internal.runners.rules.RuleMemberValidator.RULE_METHOD_VALIDATOR;
 
@@ -68,7 +71,7 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
         return statement;
     }
 
-    protected Statement withRepeats(FrameworkMethod frameworkMethod, Object target, Statement next) {
+    protected Statement withRepeats(FrameworkMethod frameworkMethod, Object target, Statement next) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         // check timeout
         long testTimeout = TestUtils.getTestTimeout(frameworkMethod);
         long repeatTimeout = TestUtils.getRepeatTimeout(frameworkMethod.getMethod());
@@ -88,9 +91,21 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
             String msg = String.format("Repeat value and number of params doesn't match %d/%d!! It must be same.", repeatValue, repeatParams.length);
             log.error(msg);
             throw new IllegalArgumentException(msg);
-
         }
 
+        // check repeat value and methodParams size
+        String repeatMethod = TestUtils.getRepeatMethod(frameworkMethod.getMethod());
+        if (StringUtils.isNotEmpty(repeatMethod)) {
+            Optional<Object[]> repeatReturnedParam = TestUtils.getRepeatReturnedParam(target, repeatMethod);
+            repeatReturnedParam.ifPresent(r -> {
+                if ((repeatValue > 1 && r.length > 0) &&
+                        repeatValue != r.length) {
+                    String msg = String.format("Repeat value and number of returned method params doesn't match %d/%d!! It must be same.", repeatValue, r.length);
+                    log.error(msg);
+                    throw new IllegalArgumentException(msg);
+                }
+            });
+        }
         return new RepeatHandler(next, target, frameworkMethod.getMethod());
     }
 }
