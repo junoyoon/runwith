@@ -1,11 +1,14 @@
 package me.ryan.runwith.common;
 
 import me.ryan.runwith.annotation.Repeat;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class TestUtils {
 
@@ -72,5 +75,20 @@ public class TestUtils {
         }
         throw new IllegalArgumentException(String.format("Parameter type (%s) cannot be handled!" +
                 " Only primitive types, BigDecimals and Strings can be used.", parameterType));
+    }
+
+    public static String getRepeatMethod(Method method) {
+        Repeat repeat = method.getAnnotation(Repeat.class);
+        return repeat.method();
+    }
+
+    public static Optional<Object[]> getRepeatReturnedParam(Object target, String paramMethodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (StringUtils.isNotEmpty(paramMethodName)) {
+            Method paramMethod = target.getClass().getDeclaredMethod(paramMethodName);
+            paramMethod.setAccessible(true);
+            return Optional.of((Object[]) paramMethod.invoke(target));
+        } else {
+            return Optional.empty();
+        }
     }
 }

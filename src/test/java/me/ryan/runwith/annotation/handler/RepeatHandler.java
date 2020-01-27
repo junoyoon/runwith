@@ -1,13 +1,14 @@
 package me.ryan.runwith.annotation.handler;
 
-
 import me.ryan.runwith.common.TestUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 public class RepeatHandler extends Statement {
@@ -21,6 +22,7 @@ public class RepeatHandler extends Statement {
     private final boolean repeatable;
 
     private final String[] params;
+    private final String method;
 
     public RepeatHandler(Statement next, Object target, Method testMethod) {
         this(next, target, testMethod, TestUtils.getRepeatCount(testMethod), TestUtils.isRepeatable(testMethod));
@@ -33,12 +35,17 @@ public class RepeatHandler extends Statement {
         this.repeat = repeat;
         this.repeatable = repeatable;
         this.params = TestUtils.getRepeatParams(testMethod);
+        this.method = TestUtils.getRepeatMethod(testMethod);
+
     }
 
     @Override
     public void evaluate() throws Throwable {
         long startTime = System.currentTimeMillis();
         long timeout = TestUtils.getRepeatTimeout(testMethod);
+
+        Optional<Object[]> repeatReturnedParam = TestUtils.getRepeatReturnedParam(target, this.method);
+
         if (this.repeat < 1 && log.isInfoEnabled()) {
             log.info(String.format("Repeat value is %d. Skip [%s]] test.", this.repeat, this.testMethod.getName()));
         }
@@ -49,6 +56,8 @@ public class RepeatHandler extends Statement {
             if (ArrayUtils.isNotEmpty(this.params)) {
                 Object[] paramArgs = TestUtils.getParamArgs(testMethod, this.params[i]);
                 testMethod.invoke(target, paramArgs);
+            } else if (StringUtils.isNotEmpty(this.method) && repeatReturnedParam.isPresent()) {
+                testMethod.invoke(target, (Object[]) repeatReturnedParam.get()[i]);
             } else {
                 this.next.evaluate();
             }
