@@ -63,6 +63,7 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
             statement = withRepeats(method, test, statement);
         } catch (Exception e) {
             e.printStackTrace();
+            return new Fail(e);
         }
         return statement;
     }
@@ -84,8 +85,9 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
         String[] repeatParams = TestUtils.getRepeatParams(frameworkMethod.getMethod());
         if ((repeatValue > 1 && repeatParams.length > 0) &&
                 repeatValue != repeatParams.length) {
-            throw new IllegalArgumentException(
-                    String.format("Repeat value and number of params doesn't match %d/%d!! It must be same.", repeatValue, repeatParams.length));
+            String msg = String.format("Repeat value and number of params doesn't match %d/%d!! It must be same.", repeatValue, repeatParams.length);
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
 
         }
 
