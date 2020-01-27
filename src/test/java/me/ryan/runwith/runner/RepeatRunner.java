@@ -59,7 +59,11 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
         statement = possiblyExpectingExceptions(method, test, statement);
         statement = withBefores(method, test, statement);
         statement = withAfters(method, test, statement);
-        statement = withRepeats(method, test, statement);
+        try {
+            statement = withRepeats(method, test, statement);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return statement;
     }
 
