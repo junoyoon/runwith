@@ -79,7 +79,7 @@ public class TestUtils {
 
     public static String getRepeatMethod(Method method) {
         Repeat repeat = method.getAnnotation(Repeat.class);
-        return repeat.method();
+        return repeat == null ? "" : repeat.method();
     }
 
     public static Optional<Object[]> getRepeatReturnedParam(Object target, String paramMethodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
