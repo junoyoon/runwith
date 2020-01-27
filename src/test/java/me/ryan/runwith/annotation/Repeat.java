@@ -11,4 +11,6 @@ public @interface Repeat {
     long timeout() default 0;   // Timeout for all repeat millisecond
 
     String[] params() default {};
+
+    String method() default ""; // parameter method name
 }

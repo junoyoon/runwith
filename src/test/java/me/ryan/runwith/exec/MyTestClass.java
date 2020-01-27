@@ -152,12 +152,28 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(value = 5, params = {"3, 2", "4, 3", "5, 5", "6, 8", "7, true"})  // 테스트 케이스에서 사용하는 인자 타입과 params 의 타입이 다른경우 에러.
+    @Repeat(value = 5, params = {"3, 2", "4, 3", "5, 5", "6, 8", "7, true"})
+    // 테스트 케이스에서 사용하는 인자 타입과 params 의 타입이 다른경우 에러.
     @TestDescription("테스트 케이스의 인자값의 타입과 param 에서 들어오는 타입이 다른경우 익셉션 처리." +
             "- 실패하는 테스트")
     public void given_fibo_when_differentTestCaseParamsAndParametersType_thenThrowException(int number, int expected) {
         Fibo fibo = new Fibo();
         int result = fibo.calculateFibo(number);
         assertEquals(expected, result);
+    }
+
+    @Test
+    @Repeat(value = 2, method = "paramMethod")
+    public void given_paramsMethod_whenRepeatParamsWithMethod_thenRunTestWithParams(int number, int expected) {
+        Fibo fibo = new Fibo();
+        int result = fibo.calculateFibo(number);
+        assertEquals(expected, result);
+    }
+
+    private Object[] paramMethod() {
+        return new Object[]{
+                new Object[]{6, 8},
+                new Object[]{5, 5}
+        };
     }
 }
