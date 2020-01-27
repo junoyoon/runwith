@@ -181,7 +181,7 @@ public class MyTestClass {
     @Test
     @Repeat(value = 2, params = {"6, 8", "5, 5"}, method = "bothParamMethod")
     @TestDescription("params 와 method 를 동시에 사용하는 경우 익셉션 처리." +
-            "- 실패하는 테스트")
+            "- 실패하는 테스")
     public void given_Fibo_whenUseParamsAndMethod_thenThrowException(int number, int expected) {
         Fibo fibo = new Fibo();
         int result = fibo.calculateFibo(number);
@@ -198,7 +198,7 @@ public class MyTestClass {
     @Test
     @Repeat(value = 2, method = "overParamMethod")
     @TestDescription("피보나치 수열에서 value 와 사이즈가 다른 파라미터를 다른 메소드로 받아 테스트를 수행하면 익셉션 처리." +
-            "- 실패하는 테스")
+            "- 실패하는 테스트")
     public void given_paramsMethod_whenNotEaualValueAndParamMethodSize_thenThrowException(int number, int expected) {
         Fibo fibo = new Fibo();
         int result = fibo.calculateFibo(number);
