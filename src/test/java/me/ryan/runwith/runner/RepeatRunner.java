@@ -2,6 +2,7 @@ package me.ryan.runwith.runner;
 
 import me.ryan.runwith.annotation.handler.RepeatHandler;
 import me.ryan.runwith.common.TestUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,6 +107,14 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
                 }
             });
         }
+
+        // check both params and method
+        if (ArrayUtils.isNotEmpty(repeatParams) && StringUtils.isNotEmpty(repeatMethod)) {
+            String msg = "Do not use params and method in @Repeat.";
+            log.error(msg);
+            throw new IllegalStateException(msg);
+        }
+
         return new RepeatHandler(next, target, frameworkMethod.getMethod());
     }
 }
