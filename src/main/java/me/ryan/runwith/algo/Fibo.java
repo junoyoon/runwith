@@ -2,7 +2,7 @@ package me.ryan.runwith.algo;
 
 public class Fibo {
     public int calculateFibo(int number) {
-        return this.fibo(number);
+        return this.calculateFibo(number, false);
     }
 
     public int calculateFibo(int number, boolean isFast) {
