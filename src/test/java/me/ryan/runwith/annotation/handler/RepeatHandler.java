@@ -44,35 +44,55 @@ public class RepeatHandler extends Statement {
     @Override
     public void evaluate() throws Throwable {
         long startTime = System.currentTimeMillis();
+        loggingSkip();
+        repeatInvoke(startTime);
+        loggingEnd(startTime);
+    }
 
+    private void repeatInvoke(long startTime) throws Throwable {
         Optional<Object[]> repeatReturnedParam = TestUtils.getRepeatReturnedParam(target, this.method);
-        if (this.repeat < 1 && log.isInfoEnabled()) {
-            log.info(String.format(RepeatTestMessages.MINUS_REPEAT_VALUE, this.repeat, this.testMethod.getName()));
-        }
         for (int i = 0; i < this.repeat; i++) {
-            if (repeatable && log.isInfoEnabled()) {
-                log.info(String.format(RepeatTestMessages.DEFAULT_REPEAT_MESSAGE, i + 1, this.testMethod.getName()));
-            }
-
-            if (ArrayUtils.isNotEmpty(this.params)) {
-                Object[] paramArgs = TestUtils.getParamArgs(testMethod, this.params[i]);
-                testMethod.invoke(target, paramArgs);
-            } else if (StringUtils.isNotEmpty(this.method) && repeatReturnedParam.isPresent()) {
-                testMethod.invoke(target, (Object[]) repeatReturnedParam.get()[i]);
-            } else {
-                this.next.evaluate();
-            }
-
+            loggingEach(i);
+            invokeEach(repeatReturnedParam, i);
             long elapsed = System.currentTimeMillis() - startTime;
-            if (timeout > 0 && elapsed > timeout) {
-                throw new TimeoutException(
-                        String.format(RepeatTestMessages.TIMEOUT_EXCEPTION_MESSAGE, elapsed, timeout, (i + 1), this.repeat));
-            }
+            checkTimeout(i, elapsed);
         }
+    }
 
+    private void invokeEach(Optional<Object[]> repeatReturnedParam, int i) throws Throwable {
+        if (ArrayUtils.isNotEmpty(this.params)) {
+            Object[] paramArgs = TestUtils.getParamArgs(testMethod, this.params[i]);
+            testMethod.invoke(target, paramArgs);
+        } else if (StringUtils.isNotEmpty(this.method) && repeatReturnedParam.isPresent()) {
+            testMethod.invoke(target, (Object[]) repeatReturnedParam.get()[i]);
+        } else {
+            this.next.evaluate();
+        }
+    }
+
+    private void loggingEnd(long startTime) {
         long totalElapsed = System.currentTimeMillis() - startTime;
         if (timeout > 0 && log.isInfoEnabled()) {
             log.info(String.format(RepeatTestMessages.REPEAT_FINISH_MESSAGE, totalElapsed, timeout));
+        }
+    }
+
+    private void checkTimeout(int i, long elapsed) throws TimeoutException {
+        if (timeout > 0 && elapsed > timeout) {
+            throw new TimeoutException(
+                    String.format(RepeatTestMessages.TIMEOUT_EXCEPTION_MESSAGE, elapsed, timeout, (i + 1), this.repeat));
+        }
+    }
+
+    private void loggingSkip() {
+        if (this.repeat < 1 && log.isInfoEnabled()) {
+            log.info(String.format(RepeatTestMessages.MINUS_REPEAT_VALUE, this.repeat, this.testMethod.getName()));
+        }
+    }
+
+    private void loggingEach(int i) {
+        if (repeatable && log.isInfoEnabled()) {
+            log.info(String.format(RepeatTestMessages.DEFAULT_REPEAT_MESSAGE, i + 1, this.testMethod.getName()));
         }
     }
 }
