@@ -80,13 +80,13 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(value = 10, timeout = 30000)  // 전체 수행시간 30초 제한
-    @TestDescription("피보나치 수열 테스트 10회를 제한시간 30초 이내에 수행한다.")
+    @Repeat(value = 10, timeout = 6000)  // 전체 수행시간 6초 제한
+    @TestDescription("피보나치 수열 테스트 10회를 제한시간 6초 이내에 수행한다.")
     public void given_fibo_when_numberIs43Repeat10Times_then_returnValueIs433494437AndFinishIn10seconds() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
-        int number = 43;
-        int expected = 433494437;
+        int number = 40;
+        int expected = 102334155;
         int result = fibo.calculateFibo(number);
         System.out.println(result);
         assertEquals(expected, result);
@@ -106,13 +106,13 @@ public class MyTestClass {
     }
 
     @Test
-    @Repeat(value = 2, timeout = 7000)    // 전체 수행시간 7초 제한
-    @TestDescription("피보나치 수열 테스트 2회를 제한시간 7초 이내에 수행한다.")
+    @Repeat(value = 2, timeout = 5000)    // 전체 수행시간 5초 제한
+    @TestDescription("피보나치 수열 테스트 2회를 제한시간 5초 이내에 수행한다.")
     public void given_fibo_when_setTimeout5Second_thenThrowExceptionImmediately() {
         Fibo fibo = new Fibo();
         // 1 1 2 3 5 8 13 21 34 ...
-        int number = 43;
-        int expected = 433494437;
+        int number = 42;
+        int expected = 267914296;
         int result = fibo.calculateFibo(number);
         System.out.println(result);
         assertEquals(expected, result);
