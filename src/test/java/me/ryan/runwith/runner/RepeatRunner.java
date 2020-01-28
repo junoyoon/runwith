@@ -73,28 +73,26 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
     }
 
     protected Statement withRepeats(FrameworkMethod frameworkMethod, Object target, Statement next) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        // check timeout
-        long testTimeout = TestUtils.getTestTimeout(frameworkMethod);
-        long repeatTimeout = TestUtils.getRepeatTimeout(frameworkMethod.getMethod());
-        if (testTimeout > 0 && repeatTimeout > 0) {
-            String msg = String.format("Test method [%s] has been configured with Repeat's @Repeat(timeout=%s) and " +
-                    "JUnit's @Test(timeout=%s) annotations, but only one declaration of a 'timeout' is " +
-                    "permitted per test method.", frameworkMethod.getMethod(), repeatTimeout, testTimeout);
+        checkTestTimeoutAndRepeatTimeoutValidation(frameworkMethod);
+        checkRepeatValueAndPraramsSizeValidation(frameworkMethod);
+        checkRepeatValueAndMethodParamsSzieValidation(frameworkMethod, target);
+        checkRepeatParamsAndMethodParamsBothUseValidation(frameworkMethod);
+
+        return new RepeatHandler(next, target, frameworkMethod.getMethod());
+    }
+
+    private void checkRepeatParamsAndMethodParamsBothUseValidation(FrameworkMethod frameworkMethod) {
+        String[] repeatParams = TestUtils.getRepeatParams(frameworkMethod.getMethod());
+        String repeatMethod = TestUtils.getRepeatMethod(frameworkMethod.getMethod());
+        if (ArrayUtils.isNotEmpty(repeatParams) && StringUtils.isNotEmpty(repeatMethod)) {
+            String msg = "Do not use params and method in @Repeat.";
             log.error(msg);
             throw new IllegalStateException(msg);
         }
+    }
 
-        // check repeat value and params size
+    private void checkRepeatValueAndMethodParamsSzieValidation(FrameworkMethod frameworkMethod, Object target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         int repeatValue = TestUtils.getRepeatCount(frameworkMethod.getMethod());
-        String[] repeatParams = TestUtils.getRepeatParams(frameworkMethod.getMethod());
-        if ((repeatValue > 1 && repeatParams.length > 0) &&
-                repeatValue != repeatParams.length) {
-            String msg = String.format("Repeat value and number of params doesn't match %d/%d!! It must be same.", repeatValue, repeatParams.length);
-            log.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-
-        // check repeat value and methodParams size
         String repeatMethod = TestUtils.getRepeatMethod(frameworkMethod.getMethod());
         if (StringUtils.isNotEmpty(repeatMethod)) {
             Optional<Object[]> repeatReturnedParam = TestUtils.getRepeatReturnedParam(target, repeatMethod);
@@ -107,14 +105,28 @@ public class RepeatRunner extends BlockJUnit4ClassRunner {
                 }
             });
         }
+    }
 
-        // check both params and method
-        if (ArrayUtils.isNotEmpty(repeatParams) && StringUtils.isNotEmpty(repeatMethod)) {
-            String msg = "Do not use params and method in @Repeat.";
+    private void checkRepeatValueAndPraramsSizeValidation(FrameworkMethod frameworkMethod) {
+        int repeatValue = TestUtils.getRepeatCount(frameworkMethod.getMethod());
+        String[] repeatParams = TestUtils.getRepeatParams(frameworkMethod.getMethod());
+        if ((repeatValue > 1 && repeatParams.length > 0) &&
+                repeatValue != repeatParams.length) {
+            String msg = String.format("Repeat value and number of params doesn't match %d/%d!! It must be same.", repeatValue, repeatParams.length);
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    private void checkTestTimeoutAndRepeatTimeoutValidation(FrameworkMethod frameworkMethod) {
+        long testTimeout = TestUtils.getTestTimeout(frameworkMethod);
+        long repeatTimeout = TestUtils.getRepeatTimeout(frameworkMethod.getMethod());
+        if (testTimeout > 0 && repeatTimeout > 0) {
+            String msg = String.format("Test method [%s] has been configured with Repeat's @Repeat(timeout=%s) and " +
+                    "JUnit's @Test(timeout=%s) annotations, but only one declaration of a 'timeout' is " +
+                    "permitted per test method.", frameworkMethod.getMethod(), repeatTimeout, testTimeout);
             log.error(msg);
             throw new IllegalStateException(msg);
         }
-
-        return new RepeatHandler(next, target, frameworkMethod.getMethod());
     }
 }
