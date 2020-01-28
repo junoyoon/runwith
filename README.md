@@ -9,6 +9,6 @@
 3. may be build fail because intended failure test case. <br>
 4. copy report : file ~/runwith/build/reports/tests/test/index.html <br>
 5. open browser and paste file address in #4. <br>
-5. click packages or classes -> me.ryan.runwith.MyTestClass. <br>
+5. click packages or classes -> me.ryan.runwith.* <br>
 6. check Tests and standard output and errors. <br>
 7. after then show source code in test package. <br>
