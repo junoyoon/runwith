@@ -22,6 +22,7 @@ public class RepeatHandler extends Statement {
     private final int repeat;
     private final boolean repeatable;
 
+    private final long timeout;
     private final String[] params;
     private final String method;
 
@@ -37,15 +38,14 @@ public class RepeatHandler extends Statement {
         this.repeatable = repeatable;
         this.params = TestUtils.getRepeatParams(testMethod);
         this.method = TestUtils.getRepeatMethod(testMethod);
+        this.timeout = TestUtils.getRepeatTimeout(testMethod);
     }
 
     @Override
     public void evaluate() throws Throwable {
         long startTime = System.currentTimeMillis();
-        long timeout = TestUtils.getRepeatTimeout(testMethod);
 
         Optional<Object[]> repeatReturnedParam = TestUtils.getRepeatReturnedParam(target, this.method);
-
         if (this.repeat < 1 && log.isInfoEnabled()) {
             log.info(String.format(RepeatTestMessages.MINUS_REPEAT_VALUE, this.repeat, this.testMethod.getName()));
         }
@@ -53,6 +53,7 @@ public class RepeatHandler extends Statement {
             if (repeatable && log.isInfoEnabled()) {
                 log.info(String.format(RepeatTestMessages.DEFAULT_REPEAT_MESSAGE, i + 1, this.testMethod.getName()));
             }
+
             if (ArrayUtils.isNotEmpty(this.params)) {
                 Object[] paramArgs = TestUtils.getParamArgs(testMethod, this.params[i]);
                 testMethod.invoke(target, paramArgs);
@@ -61,12 +62,14 @@ public class RepeatHandler extends Statement {
             } else {
                 this.next.evaluate();
             }
+
             long elapsed = System.currentTimeMillis() - startTime;
             if (timeout > 0 && elapsed > timeout) {
                 throw new TimeoutException(
                         String.format(RepeatTestMessages.TIMEOUT_EXCEPTION_MESSAGE, elapsed, timeout, (i + 1), this.repeat));
             }
         }
+
         long totalElapsed = System.currentTimeMillis() - startTime;
         if (timeout > 0 && log.isInfoEnabled()) {
             log.info(String.format(RepeatTestMessages.REPEAT_FINISH_MESSAGE, totalElapsed, timeout));
